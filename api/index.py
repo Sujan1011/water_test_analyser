@@ -1,16 +1,16 @@
 # Vercel API route for serverless Flask app
-import sys
 import os
+import sys
 
 # Add the parent directory to the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import Flask app - this creates the app at module load time
-from web_app import app as flask_app
-
 def handler(request, context):
-    """Vercel Python handler"""
+    """Vercel Python handler - lazy loading to avoid import errors"""
     try:
+        # Import Flask app here to catch any import errors
+        from web_app import app as flask_app
+        
         # Vercel may pass a request object with an 'environ' attribute, or it may pass the WSGI environ dict directly.
         environ = getattr(request, "environ", request)
 
@@ -41,9 +41,10 @@ def handler(request, context):
             "body": body_bytes.decode("utf-8", errors="replace"),
         }
     except Exception as e:
-        # Return error response
+        import traceback
+        # Return error response with detailed error
         return {
             "statusCode": 500,
-            "headers": {"Content-Type": "application/json"},
-            "body": f"{{\"error\": \"{str(e)}\"}}",
+            "headers": {"Content-Type": "text/plain"},
+            "body": f"Error: {str(e)}\n\n{traceback.format_exc()}",
         }
