@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Test Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .test-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f0f0f0;
+            color: #333;
+            min-width: 120px;
+        }
+
+        .test-btn.active {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .image-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .image-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .image-card h3 {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 300px;
+            border: 3px dashed #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .image-preview:hover {
+            border-color: #667eea;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .placeholder-text {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .analyze-btn {
+            display: block;
+            width: 250px;
+            margin: 0 auto 30px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .analyze-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .results-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .result-value-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .result-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .result-unit {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .result-level {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .level-safe { background: #c6f6d5; color: #22543d; }
+        .level-warning { background: #feebc8; color: #744210; }
+        .level-danger { background: #fed7d7; color: #742a2a; }
+
+        .explanation-box {
+            background: #ebf4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .recommendation-box {
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .color-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Session Tests Section */
+        .session-tests-section {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #667eea30;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .session-header h3 {
+            color: #333;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .session-header h3:before {
+            content: '📋';
+            font-size: 1.2em;
+        }
+
+        .session-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .session-stat {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .session-stat span {
+            font-weight: bold;
+            color: #667eea;
+            margin-left: 5px;
+        }
+
+        .session-tests-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background: white;
+            padding: 10px;
+        }
+
+        .session-test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .session-test-item:hover {
+            background: #f7fafc;
+        }
+
+        .session-test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-info {
+            flex: 1;
+        }
+
+        .test-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .badge-ph { background: #667eea20; color: #667eea; }
+        .badge-iron { background: #ed893620; color: #ed8936; }
+        .badge-hardness { background: #48bb7820; color: #48bb78; }
+        .badge-chlorine { background: #9f7aea20; color: #9f7aea; }
+
+        .test-result-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .test-timestamp {
+            font-size: 0.8em;
+            color: #999;
+            margin-left: 10px;
+        }
+
+        .test-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .test-action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .test-action-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .clear-session-btn {
+            padding: 8px 20px;
+            background: #f56565;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-session-btn:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+
+        .empty-session {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Download Section Styles */
+        .download-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .download-section h4 {
+            color: #2d3748;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-section h4:before {
+            content: '📥';
+            font-size: 1.2em;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .download-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .download-btn.txt {
+            background: #48bb78;
+            color: white;
+        }
+
+        .download-btn.txt:hover:not(:disabled) {
+            background: #38a169;
+        }
+
+        .download-btn.json {
+            background: #805ad5;
+            color: white;
+        }
+
+        .download-btn.json:hover:not(:disabled) {
+            background: #6b46c1;
+        }
+
+        .download-btn.csv {
+            background: #ed8936;
+            color: white;
+        }
+
+        .download-btn.csv:hover:not(:disabled) {
+            background: #dd6b20;
+        }
+
+        .download-all-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .download-all-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .download-all-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-all-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .download-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .download-notification.error {
+            background: #f56565;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .camera-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .camera-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .camera-container video {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #667eea);
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+
+        .ml-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #9f7aea;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .history-item:hover {
+            background: #f7fafc;
+        }
+
+        @media (max-width: 768px) {
+            .image-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .test-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .test-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+            
+            .download-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .session-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .session-test-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .test-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💧 Professional Water Quality Test Analyzer</h1>
+        <p class="subtitle">Advanced color analysis with machine learning</p>
+
+        <div class="test-selector">
+            <button class="test-btn active" onclick="selectTest('ph')">pH Test</button>
+            <button class="test-btn" onclick="selectTest('iron')">Iron Test</button>
+            <button class="test-btn" onclick="selectTest('hardness')">Hardness Test</button>
+            <button class="test-btn" onclick="selectTest('chlorine')">Chlorine Test</button>
+        </div>
+
+        <div class="image-section">
+            <div class="image-card">
+                <h3>Before Test (Dry Strip)</h3>
+                <div class="image-preview" id="beforePreview" onclick="uploadImage('before')">
+                    <span class="placeholder-text">Click to upload or use camera</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); openCamera('before')">📷 Open Camera</button>
+                    <button class="btn btn-secondary" onclick="event.stopPropagation(); uploadImage('before')">📁 Browse</button>
+                    <button class="btn btn-danger" onclick="event.stopPropagation(); clearImage('before')">🗑️ Clear</button>
+                </div>
+                <input type="file" id="beforeInput" accept="image/*" onchange="handleImageUpload(event, 'before')">
+            </div>
+
+            <div class="image-card">
+                <h3>After Test (Wet Strip)</h3>
+                <div class="image-preview" id="afterPreview" onclick="uploadImage('after')">
+                    <span class="placeholder-text">Click to upload or use camera</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); openCamera('after')">📷 Open Camera</button>
+                    <button class="btn btn-secondary" onclick="event.stopPropagation(); uploadImage('after')">📁 Browse</button>
+                    <button class="btn btn-danger" onclick="event.stopPropagation(); clearImage('after')">🗑️ Clear</button>
+                </div>
+                <input type="file" id="afterInput" accept="image/*" onchange="handleImageUpload(event, 'after')">
+            </div>
+        </div>
+
+        <button class="analyze-btn" onclick="analyze()" id="analyzeBtn">
+            🔬 Analyze Water Sample
+        </button>
+
+        <!-- Current Session Tests Section -->
+        <div class="session-tests-section" id="sessionTests">
+            <div class="session-header">
+                <h3>📋 Tests Performed in This Session</h3>
+                <div class="session-stats">
+                    <div class="session-stat">
+                        Total Tests: <span id="totalTests">0</span>
+                    </div>
+                    <div class="session-stat">
+                        Last Test: <span id="lastTestTime">-</span>
+                    </div>
+                </div>
+                <button class="clear-session-btn" onclick="clearSessionTests()" id="clearSessionBtn">
+                    🗑️ Clear All
+                </button>
+            </div>
+            <div class="session-tests-list" id="sessionTestsList">
+                <div class="empty-session">
+                    No tests performed yet. Click "Analyze" to start testing!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-container" id="results" style="display: none;">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('results-tab')">📊 Results</button>
+                <button class="tab-btn" onclick="switchTab('stats-tab')">📈 Statistics</button>
+                <button class="tab-btn" onclick="switchTab('history-tab')">📋 History</button>
+            </div>
+
+            <div class="tab-content active" id="results-tab">
+                <div class="results-section">
+                    <h2>Analysis Results</h2>
+                    <div class="result-card" id="resultContent"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="stats-tab">
+                <div class="results-section">
+                    <h2>Detailed Statistics</h2>
+                    <div class="result-card" id="statsContent"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="history-tab">
+                <div class="results-section">
+                    <h2>Test History</h2>
+                    <div class="result-card">
+                        <div class="history-list" id="historyContent">
+                            <p class="placeholder-text">No test history available</p>
+                        </div>
+                        
+                        <!-- Download All Results Button in History Tab -->
+                        <div class="download-all-container">
+                            <p>📊 Export all test results for analysis in Excel or other applications</p>
+                            <button class="download-all-btn" onclick="downloadAllResults('csv')" id="downloadAllBtn">
+                                📥 Download All Results as CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading hidden" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing water sample with ML model...</p>
+            <small>This may take a few seconds</small>
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div id="cameraModal" class="camera-modal" style="display: none;">
+        <div class="camera-container">
+            <video id="camera" autoplay playsinline></video>
+            <canvas id="cameraCanvas" style="display: none;"></canvas>
+            <div class="camera-controls">
+                <button class="btn btn-secondary" onclick="closeCamera()">Cancel</button>
+                <button class="btn btn-success" onclick="capturePhoto()">Capture</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Notification (hidden by default) -->
+    <div id="downloadNotification" class="download-notification hidden"></div>
+
+    <script>
+        let currentTest = 'ph';
+        let beforeImage = null;
+        let afterImage = null;
+        let currentCameraType = null;
+        let cameraStream = null;
+        let testHistory = [];
+        let currentResultIndex = -1;
+        
+        // Session tests array to store all tests performed in current session
+        let sessionTests = [];
+
+        // Load history from localStorage
+        try {
+            const saved = localStorage.getItem('testHistory');
+            if (saved) {
+                testHistory = JSON.parse(saved);
+            }
+        } catch (e) {
+            console.log('No history found');
+        }
+
+        function selectTest(test) {
+            currentTest = test;
+            document.querySelectorAll('.test-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function openCamera(type) {
+            currentCameraType = type;
+            const modal = document.getElementById('cameraModal');
+            modal.style.display = 'flex';
+            
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    cameraStream = stream;
+                    document.getElementById('camera').srcObject = stream;
+                })
+                .catch(err => {
+                    alert('Could not access camera: ' + err.message);
+                    closeCamera();
+                });
+        }
+
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraModal').style.display = 'none';
+            currentCameraType = null;
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('cameraCanvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = canvas.toDataURL('image/jpeg');
+            displayImage(imageData, currentCameraType);
+            closeCamera();
+        }
+
+        function uploadImage(type) {
+            document.getElementById(type + 'Input').click();
+        }
+
+        function handleImageUpload(event, type) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    displayImage(e.target.result, type);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayImage(imageData, type) {
+            const preview = document.getElementById(type + 'Preview');
+            preview.innerHTML = `<img src="${imageData}" alt="${type} test strip">`;
+            
+            if (type === 'before') {
+                beforeImage = imageData;
+            } else {
+                afterImage = imageData;
+            }
+        }
+
+        function clearImage(type) {
+            const preview = document.getElementById(type + 'Preview');
+            preview.innerHTML = '<span class="placeholder-text">Click to upload or use camera</span>';
+            
+            if (type === 'before') {
+                beforeImage = null;
+            } else {
+                afterImage = null;
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function analyze() {
+            if (!beforeImage || !afterImage) {
+                alert('Please capture both before and after images');
+                return;
+            }
+
+            document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        before_image: beforeImage,
+                        after_image: afterImage,
+                        test_type: currentTest
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                    addToHistory(data);
+                    addToSessionTests(data); // Add to session tests
+                    
+                    // Store the current result index
+                    const historyResponse = await fetch('/history');
+                    const history = await historyResponse.json();
+                    currentResultIndex = history.length - 1;
+                } else {
+                    alert('Analysis failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        // Add test to session
+        function addToSessionTests(data) {
+            const sessionTest = {
+                id: sessionTests.length,
+                timestamp: data.timestamp,
+                test_type: data.test_type,
+                result: data.result,
+                color: data.after.color_name,
+                rgb: data.after.rgb,
+                explanation: data.explanation,
+                recommendation: data.recommendation
+            };
+            
+            sessionTests.unshift(sessionTest); // Add to beginning
+            updateSessionDisplay();
+        }
+
+        // Update session display
+        function updateSessionDisplay() {
+            const sessionList = document.getElementById('sessionTestsList');
+            const totalTests = document.getElementById('totalTests');
+            const lastTestTime = document.getElementById('lastTestTime');
+            
+            // Update stats
+            totalTests.textContent = sessionTests.length;
+            
+            if (sessionTests.length > 0) {
+                const lastTest = sessionTests[0];
+                const date = new Date(lastTest.timestamp);
+                lastTestTime.textContent = date.toLocaleTimeString();
+            } else {
+                lastTestTime.textContent = '-';
+            }
+            
+            // Build session tests list
+            if (sessionTests.length === 0) {
+                sessionList.innerHTML = '<div class="empty-session">No tests performed yet. Click "Analyze" to start testing!</div>';
+                return;
+            }
+            
+            const sessionHtml = sessionTests.map((test, index) => {
+                // Get badge class based on test type
+                let badgeClass = 'badge-ph';
+                if (test.test_type === 'iron') badgeClass = 'badge-iron';
+                else if (test.test_type === 'hardness') badgeClass = 'badge-hardness';
+                else if (test.test_type === 'chlorine') badgeClass = 'badge-chlorine';
+                
+                const date = new Date(test.timestamp);
+                const timeStr = date.toLocaleTimeString();
+                const dateStr = date.toLocaleDateString();
+                
+                return `
+                    <div class="session-test-item" onclick="loadSessionTest(${index})">
+                        <div class="test-info">
+                            <span class="test-badge ${badgeClass}">${test.test_type.toUpperCase()}</span>
+                            <span class="test-result-value">${test.result.value} ${test.result.unit}</span>
+                            <span class="result-level ${getLevelClass(test.result.level)}" style="padding: 2px 8px; font-size: 0.8em; margin-left: 10px;">${test.result.level}</span>
+                            <div style="margin-top: 5px;">
+                                <small class="test-timestamp">${dateStr} ${timeStr}</small>
+                                <small style="color: #666; margin-left: 10px;">Color: ${test.color}</small>
+                            </div>
+                        </div>
+                        <div class="test-actions">
+                            <button class="test-action-btn" onclick="event.stopPropagation(); downloadSessionTest(${index}, 'txt')">📄 TXT</button>
+                            <button class="test-action-btn" onclick="event.stopPropagation(); downloadSessionTest(${index}, 'json')">📊 JSON</button>
+                            <button class="test-action-btn" onclick="event.stopPropagation(); downloadSessionTest(${index}, 'csv')">📈 CSV</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            sessionList.innerHTML = sessionHtml;
+        }
+
+        // Load a session test for viewing
+        function loadSessionTest(index) {
+            const test = sessionTests[index];
+            
+            // Create a data object similar to API response
+            const data = {
+                success: true,
+                timestamp: test.timestamp,
+                test_type: test.test_type,
+                after: {
+                    color_name: test.color,
+                    rgb: test.rgb,
+                    hex: rgbToHex(test.rgb[0], test.rgb[1], test.rgb[2])
+                },
+                result: test.result,
+                explanation: test.explanation,
+                recommendation: test.recommendation,
+                ml_analysis: null,
+                comparison: {
+                    color_change: 0,
+                    change_percentage: 0,
+                    mse: 0
+                }
+            };
+            
+            displayResults(data);
+            currentResultIndex = test.id;
+            
+            // Switch to results tab
+            document.querySelectorAll('.tab-btn')[0].click();
+        }
+
+        // Download a session test
+        async function downloadSessionTest(index, format) {
+            currentResultIndex = sessionTests[index].id;
+            await downloadCurrentResult(format);
+        }
+
+        // Clear all session tests
+        function clearSessionTests() {
+            if (sessionTests.length > 0 && confirm('Are you sure you want to clear all tests from this session?')) {
+                sessionTests = [];
+                updateSessionDisplay();
+                showNotification('✅ Session tests cleared', 'success');
+            }
+        }
+
+        // Helper function to get level class
+        function getLevelClass(level) {
+            if (level.includes('High') || level.includes('Severe') || level.includes('Critical') || level.includes('Very High') || level.includes('Extremely')) {
+                return 'level-danger';
+            } else if (level.includes('Medium') || level.includes('Slightly') || level.includes('Low') || level.includes('Moderate') || level.includes('Hard')) {
+                return 'level-warning';
+            }
+            return 'level-safe';
+        }
+
+        // Helper function to convert RGB to Hex
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = Math.round(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        function displayResults(data) {
+            const result = data.result;
+            const after = data.after;
+            
+            let levelClass = 'level-safe';
+            if (result.level.includes('High') || result.level.includes('Severe') || 
+                result.level.includes('Critical') || result.level.includes('Very High') ||
+                result.level.includes('Extremely')) {
+                levelClass = 'level-danger';
+            } else if (result.level.includes('Medium') || result.level.includes('Slightly') || 
+                       result.level.includes('Low') || result.level.includes('Moderate') ||
+                       result.level.includes('Hard')) {
+                levelClass = 'level-warning';
+            }
+
+            // Results tab content with download buttons
+            const resultsHtml = `
+                <div class="result-header">
+                    <div>
+                        <h3>${data.test_type.toUpperCase()} Test Results 
+                            ${data.ml_analysis ? '<span class="ml-badge">ML Enhanced</span>' : ''}
+                        </h3>
+                        <small>${new Date(data.timestamp).toLocaleString()}</small>
+                    </div>
+                    <div class="result-value-container">
+                        <span class="result-value">${result.value}</span>
+                        <span class="result-unit">${result.unit}</span>
+                        <span class="result-level ${levelClass}">${result.level}</span>
+                    </div>
+                </div>
+
+                <div class="color-info">
+                    <div class="color-swatch" style="background-color: ${after.hex}"></div>
+                    <div>
+                        <strong>Detected Color:</strong> ${after.color_name}<br>
+                        <small>RGB: (${after.rgb.join(', ')})</small>
+                    </div>
+                </div>
+
+                <div class="explanation-box">
+                    <strong>🔬 Scientific Explanation:</strong>
+                    <p>${data.explanation}</p>
+                </div>
+
+                <div class="recommendation-box">
+                    <strong>⚠️ Safety Recommendation:</strong>
+                    <p>${data.recommendation}</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Color Change</div>
+                        <div class="stat-value">${data.comparison.color_change.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Confidence</div>
+                        <div class="stat-value">${(data.ml_analysis?.confidence * 100 || 0).toFixed(1)}%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Change Area</div>
+                        <div class="stat-value">${data.comparison.change_percentage.toFixed(1)}%</div>
+                    </div>
+                </div>
+
+                ${data.ml_analysis ? `
+                <div style="margin-top: 15px;">
+                    <strong>ML Top Predictions:</strong>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${data.ml_analysis.confidence * 100}%"></div>
+                    </div>
+                    ${data.ml_analysis.top_predictions?.map(p => 
+                        `<div><small>${p.color_name}: ${(p.probability * 100).toFixed(1)}%</small></div>`
+                    ).join('')}
+                </div>
+                ` : ''}
+
+                <!-- Download Section -->
+                <div class="download-section">
+                    <h4>Download This Result</h4>
+                    <div class="download-buttons">
+                        <button class="download-btn txt" onclick="downloadCurrentResult('txt')" id="downloadTxtBtn" ${currentResultIndex === -1 ? 'disabled' : ''}>
+                            📄 Download as Text
+                        </button>
+                        <button class="download-btn json" onclick="downloadCurrentResult('json')" id="downloadJsonBtn" ${currentResultIndex === -1 ? 'disabled' : ''}>
+                            📊 Download as JSON
+                        </button>
+                        <button class="download-btn csv" onclick="downloadCurrentResult('csv')" id="downloadCsvBtn" ${currentResultIndex === -1 ? 'disabled' : ''}>
+                            📈 Download as CSV
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultContent').innerHTML = resultsHtml;
+
+            // Statistics tab content
+            const statsHtml = `
+                <h3>Color Distribution - Before Test</h3>
+                ${data.before.color_distribution.map((color, i) => `
+                    <div class="color-info">
+                        <div class="color-swatch" style="background-color: ${color.hex}"></div>
+                        <div>
+                            <strong>Color ${i+1}:</strong> ${color.percentage.toFixed(1)}%<br>
+                            <small>RGB: (${color.rgb.join(', ')})</small>
+                        </div>
+                    </div>
+                `).join('')}
+
+                <h3 style="margin-top: 20px;">Color Distribution - After Test</h3>
+                ${data.after.color_distribution.map((color, i) => `
+                    <div class="color-info">
+                        <div class="color-swatch" style="background-color: ${color.hex}"></div>
+                        <div>
+                            <strong>Color ${i+1}:</strong> ${color.percentage.toFixed(1)}%<br>
+                            <small>RGB: (${color.rgb.join(', ')})</small>
+                        </div>
+                    </div>
+                `).join('')}
+
+                <h3 style="margin-top: 20px;">Statistical Metrics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">MSE</div>
+                        <div class="stat-value">${data.comparison.mse.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">SSIM</div>
+                        <div class="stat-value">${(data.comparison.ssim || 0).toFixed(3)}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">PSNR</div>
+                        <div class="stat-value">${(data.comparison.psnr || 0).toFixed(2)} dB</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('statsContent').innerHTML = statsHtml;
+            document.getElementById('results').style.display = 'block';
+            
+            // Switch to results tab
+            document.querySelectorAll('.tab-btn')[0].click();
+        }
+
+        // ============ DOWNLOAD FUNCTIONS ============
+
+        async function downloadCurrentResult(format) {
+            if (currentResultIndex === -1) {
+                showNotification('No result available to download', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/download/${currentResultIndex}/${format}`);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Download failed');
+                }
+                
+                // Get filename from Content-Disposition header or create one
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `water_test_result.${format}`;
+                
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    if (match && match[1]) {
+                        filename = match[1].replace(/['"]/g, '');
+                    }
+                }
+                
+                // Create download link
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification(`✅ Result downloaded as ${filename}`, 'success');
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('❌ Error downloading: ' + error.message, 'error');
+            }
+        }
+
+        async function downloadAllResults(format) {
+            try {
+                const response = await fetch(`/download-all/${format}`);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Download failed');
+                }
+                
+                // Get filename
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `all_water_tests.${format}`;
+                
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    if (match && match[1]) {
+                        filename = match[1].replace(/['"]/g, '');
+                    }
+                }
+                
+                // Create download link
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification(`✅ All results downloaded as ${filename}`, 'success');
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('❌ Error downloading: ' + error.message, 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('downloadNotification');
+            notification.textContent = message;
+            notification.className = `download-notification ${type}`;
+            notification.classList.remove('hidden');
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // ============ HISTORY FUNCTIONS ============
+
+        function addToHistory(data) {
+            const historyItem = {
+                timestamp: data.timestamp,
+                test_type: data.test_type,
+                result: data.result,
+                color: data.after.color_name,
+                index: testHistory.length
+            };
+            
+            testHistory.unshift(historyItem);
+            if (testHistory.length > 10) testHistory.pop();
+            
+            try {
+                localStorage.setItem('testHistory', JSON.stringify(testHistory));
+            } catch (e) {
+                console.log('Could not save history');
+            }
+            
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            if (testHistory.length === 0) {
+                document.getElementById('historyContent').innerHTML = 
+                    '<p class="placeholder-text">No test history available</p>';
+                return;
+            }
+            
+            const historyHtml = testHistory.map((item, index) => `
+                <div class="history-item" onclick="loadHistoryItem(${index})">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${item.test_type.toUpperCase()}</strong> - 
+                            ${item.result.value} ${item.result.unit} (${item.result.level})<br>
+                            <small>${new Date(item.timestamp).toLocaleString()}</small>
+                        </div>
+                        <button class="btn btn-info btn-small" onclick="event.stopPropagation(); downloadHistoryItem(${index}, 'txt')" style="padding: 5px 10px; font-size: 12px;">
+                            📥 Download
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('historyContent').innerHTML = historyHtml;
+        }
+
+        async function loadHistoryItem(index) {
+            try {
+                const response = await fetch(`/export/${index}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load history item');
+                }
+                
+                displayResults(data);
+                currentResultIndex = index;
+                
+                document.querySelectorAll('.tab-btn')[0].click();
+                
+            } catch (error) {
+                alert('Error loading history: ' + error.message);
+            }
+        }
+
+        async function downloadHistoryItem(index, format) {
+            currentResultIndex = index;
+            await downloadCurrentResult(format);
+        }
+
+        // Initialize
+        updateHistoryDisplay();
+        updateSessionDisplay();
+    </script>
+</body>
+</html>
